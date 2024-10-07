@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, User } from "lucide-react";
-import BookSessionDialog from "./book-session-dialog";
 import BookHandler from "./book-handler";
 
 export default async function MenteeDashboard() {
@@ -85,7 +84,7 @@ export default async function MenteeDashboard() {
             <ul className="space-y-2">
               {availableSubjects.map((subject) => (
                 <li key={subject.id}>
-                  <BookSessionDialog subject={subject} />
+                  <Button variant="outline">{subject.name}</Button>
                 </li>
               ))}
             </ul>
