@@ -7,7 +7,7 @@ import { auth } from "@/auth";
 export default async function SupervisorDashboard() {
   // const session = await auth();
   // if (!session || session?.user?.role !== "mentor") {
-  //   redirect("/signin");
+  //   redirect("/login");
   // }
 
   // const allSessions = await db

@@ -35,7 +35,12 @@ export default function MentorSessionsContent(props: {
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-semibold">{session.subjects.name}</p>
+              <a
+                href={"/dashboard/mentor/" + session.sessions.id}
+                className="font-semibold hover:underline"
+              >
+                {session.subjects.name}
+              </a>
               <p className="text-sm text-muted-foreground flex items-center">
                 <User className="w-4 h-4 mr-1" /> {session.users.name}
               </p>

@@ -4,7 +4,7 @@ import { redirect, RedirectType } from "next/navigation";
 export default async function Dashboard() {
   const session = await auth();
   if (!session) {
-    redirect("/signin");
+    redirect("/login");
   } else if (session.user?.role === "mentor") {
     redirect("/dashboard/mentor", RedirectType.push);
   } else if (session.user?.role === "mentee") {

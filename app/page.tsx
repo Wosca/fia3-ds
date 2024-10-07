@@ -26,12 +26,14 @@ export default function HomePage() {
           </p>
           <div className="flex justify-center space-x-4">
             <Link href="/register">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+              <Button
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700 flex items-center"
+              >
                 Get Started
-                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Link href="/signin">
+            <Link href="/login">
               <Button size="lg" variant="outline">
                 Sign In
               </Button>

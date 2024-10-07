@@ -24,7 +24,7 @@ export default async function MentorDashboard() {
   const session = await auth();
 
   if (!session || session?.user?.role !== "mentor") {
-    redirect("/signin");
+    redirect("/login");
   }
 
   const mentorSessions = await db
