@@ -29,6 +29,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               id: user[0].id.toString(),
               name: user[0].name,
               role: user[0].role, // this will tell if the user is a mentor or mentee
+              email: user[0].email,
             };
           }
           throw new Error("Invalid Credentials");
@@ -53,6 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               )[0].id.toString(),
               name: name,
               role: credentials.mentor ? "mentor" : "mentee",
+              email: email,
             };
           } catch (error) {
             console.error(error);
@@ -66,6 +68,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, token, user }) {
       if (token) {
         session.user.id = token.id as string;
+        session.user.email = token.email as string;
         session.user.role = token.role as string; // Now this will not throw any error
       }
       return session;
@@ -74,6 +77,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // Add role to JWT token
       if (user) {
         token.id = user.id;
+        token.email = user.email;
         token.role = user.role; // Include the role in the JWT
       }
       return token;
