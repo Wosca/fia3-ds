@@ -9,6 +9,8 @@ export default async function Dashboard() {
     redirect("/dashboard/mentor", RedirectType.push);
   } else if (session.user?.role === "mentee") {
     redirect("/dashboard/mentee", RedirectType.push);
+  } else if (session.user?.role === "supervisor") {
+    redirect("/dashboard/supervisor", RedirectType.push);
   }
   return (
     <div className="container mx-auto p-4">

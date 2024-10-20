@@ -41,7 +41,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             await db.insert(users).values({
               name: name,
               email: email,
-              role: credentials.mentor ? "mentor" : "mentee",
+              role: credentials.mentor === "true" ? "mentor" : "mentee",
               passwordHash: hashedPassword,
             });
 
@@ -53,7 +53,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                   .where(eq(users.email, email))
               )[0].id.toString(),
               name: name,
-              role: credentials.mentor ? "mentor" : "mentee",
+              role: credentials.mentor === "true" ? "mentor" : "mentee",
               email: email,
             };
           } catch (error) {

@@ -5,6 +5,7 @@ import {
   timestamp,
   integer,
   uniqueIndex,
+  pgView,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -84,4 +85,8 @@ export const feedback = pgTable(
       ),
     };
   }
+);
+
+export const sessionsView = pgView("session_status").as((qb) =>
+  qb.select().from(sessions)
 );

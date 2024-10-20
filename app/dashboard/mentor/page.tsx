@@ -7,7 +7,7 @@ import {
   subjects,
   sessionInterests,
 } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and, desc, count } from "drizzle-orm";
 import { auth } from "@/auth";
 import {
   Card,
@@ -16,9 +16,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Star } from "lucide-react";
+import { Star, Calendar, Clock, Users } from "lucide-react";
 import CreateSessionDialog from "./create-session-dialog";
-import MentorSessionsContent from "./mentor-sessions-content";
 
 export default async function MentorDashboard() {
   const session = await auth();
@@ -28,16 +27,30 @@ export default async function MentorDashboard() {
   }
 
   const mentorSessions = await db
-    .select()
+    .select({
+      session: sessions,
+      subject: subjects,
+      attendeeCount: count(sessionInterests.id).as("attendeeCount"),
+    })
     .from(sessions)
-    .innerJoin(users, eq(sessions.mentorId, users.id))
-    .where(eq(users.id, Number(session.user.id)))
-    .innerJoin(subjects, eq(sessions.subjectId, subjects.id));
+    .innerJoin(subjects, eq(sessions.subjectId, subjects.id))
+    .leftJoin(sessionInterests, eq(sessions.id, sessionInterests.sessionId))
+    .where(eq(sessions.mentorId, Number(session.user.id)))
+    .groupBy(sessions.id, subjects.id)
+    .orderBy(desc(sessions.date));
 
   const mentorFeedback = await db
-    .select()
+    .select({
+      feedback: feedback,
+      mentee: users,
+      subject: subjects,
+    })
     .from(feedback)
-    .where(eq(feedback.menteeId, Number(session.user.id)));
+    .innerJoin(sessions, eq(feedback.sessionId, sessions.id))
+    .innerJoin(users, eq(feedback.menteeId, users.id))
+    .innerJoin(subjects, eq(sessions.subjectId, subjects.id))
+    .where(eq(sessions.mentorId, Number(session.user.id)))
+    .orderBy(desc(feedback.createdAt));
 
   const subjectsArray = await db.select().from(subjects);
 
@@ -48,7 +61,6 @@ export default async function MentorDashboard() {
     maxParticipants: number
   ) => {
     "use server";
-    console.log(new Date(`${date}T${time}`));
     try {
       await db.insert(sessions).values({
         mentorId: Number(session.user.id),
@@ -60,7 +72,7 @@ export default async function MentorDashboard() {
     } catch (error) {
       console.error(error);
       return {
-        error: "An unexpected error occured creating that session.",
+        error: "An unexpected error occurred creating that session.",
         success: false,
       };
     }
@@ -83,7 +95,43 @@ export default async function MentorDashboard() {
             <CardDescription>Your scheduled mentoring sessions</CardDescription>
           </CardHeader>
           <CardContent>
-            <MentorSessionsContent mentorSessions={mentorSessions} />
+            <ul className="space-y-4">
+              {mentorSessions.map((session) => (
+                <li
+                  key={session.session.id}
+                  className="border rounded-lg p-4 shadow-sm"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <a
+                        href={"/dashboard/mentor/" + session.session.id}
+                        className="font-semibold hover:underline"
+                      >
+                        {session.subject.name}
+                      </a>
+                      <p className="text-sm text-muted-foreground flex items-center">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        {new Date(session.session.date).toLocaleDateString()}
+                      </p>
+                      <p className="text-sm text-muted-foreground flex items-center">
+                        <Clock className="w-4 h-4 mr-1" />
+                        {new Date(session.session.date).toLocaleTimeString()}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm flex items-center justify-end">
+                        <Users className="w-4 h-4 mr-1" />
+                        Attendees: {session.attendeeCount} /{" "}
+                        {session.session.maxParticipants}
+                      </p>
+                      <p className="text-sm">
+                        Status: {session.session.status}
+                      </p>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </CardContent>
         </Card>
         <Card>
@@ -94,17 +142,24 @@ export default async function MentorDashboard() {
           <CardContent>
             <ul className="space-y-4">
               {mentorFeedback.map((fb) => (
-                <li key={fb.id} className="border rounded-lg p-4 shadow-sm">
+                <li
+                  key={fb.feedback.id}
+                  className="border rounded-lg p-4 shadow-sm"
+                >
                   <div className="flex items-center justify-between mb-2">
                     <p className="font-semibold flex items-center">
                       <Star className="w-4 h-4 mr-1 text-yellow-400" />
-                      Rating: {fb.rating}/5
+                      Rating: {fb.feedback.rating}/5
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {fb.createdAt?.toLocaleDateString()}
+                      {fb.feedback.createdAt?.toLocaleDateString()}
                     </p>
                   </div>
-                  <p className="text-sm">{fb.comment}</p>
+                  <p className="text-sm mb-2">{fb.feedback.comment}</p>
+                  <div className="text-xs text-muted-foreground">
+                    <p>Subject: {fb.subject.name}</p>
+                    <p>Mentee: {fb.mentee.name}</p>
+                  </div>
                 </li>
               ))}
             </ul>

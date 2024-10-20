@@ -146,6 +146,20 @@ export default function SignIn() {
           </li>
           <li className="flex items-center justify-between">
             <span>
+              <strong>Supervisor Email:</strong> supervisor@123.com
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                fillForm("supervisor@ds123.com", "Supervisor Email")
+              }
+            >
+              <FormInputIcon className="h-4 w-4" />
+            </Button>
+          </li>
+          <li className="flex items-center justify-between">
+            <span>
               <strong>Password:</strong> temppassword
             </span>
           </li>

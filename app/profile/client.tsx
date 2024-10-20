@@ -53,6 +53,7 @@ export function Client({
         setIsEditing(false);
         return;
       }
+      updateFunction(name, email, Number(session.user.id));
       setIsEditing(false);
       toast({
         title: "Profile Updated",

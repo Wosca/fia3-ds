@@ -30,6 +30,8 @@ export default function Register() {
     const password = formData.get("password") as string;
     const mentor = formData.get("mentor") === "on";
 
+    console.log(mentor);
+
     try {
       const result = await signIn("credentials", {
         email: email,
@@ -93,7 +95,7 @@ export default function Register() {
                 <Input id="password" name="password" type="password" required />
               </div>
               <div className="flex items-center space-x-2">
-                <Switch id="mentor" name="mentor" />
+                <Switch defaultChecked={false} id="mentor" name="mentor" />
                 <Label htmlFor="mentor">I want to be a mentor</Label>
               </div>
               <Button loading={loading} type="submit" className="w-full">
